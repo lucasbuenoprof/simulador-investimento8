@@ -65,9 +65,9 @@ if calcular:
 
         resultado.append([
             mes,
-            round(juros_mes, 2),
-            round(acumulado, 2),
-            round(juros_acumulados, 2)
+            juros_mes,
+            acumulado,
+            juros_acumulados
         ])
 
     df = pd.DataFrame(
@@ -76,7 +76,7 @@ if calcular:
     )
 
     # ----------------------------
-    # Métricas de destaque
+    # Métricas principais
     # ----------------------------
     st.markdown("### 📊 Resultado do investimento")
 
@@ -92,13 +92,23 @@ if calcular:
     st.markdown("---")
 
     # ----------------------------
+    # Formatar valores como moeda
+    # ----------------------------
+    df_formatado = df.copy()
+
+    df_formatado["Juros do Mês"] = df_formatado["Juros do Mês"].map("R$ {:,.2f}".format)
+    df_formatado["Total Acumulado"] = df_formatado["Total Acumulado"].map("R$ {:,.2f}".format)
+    df_formatado["Juros Acumulados"] = df_formatado["Juros Acumulados"].map("R$ {:,.2f}".format)
+
+    # ----------------------------
     # Tabela
     # ----------------------------
     st.subheader("📋 Evolução mês a mês")
 
     st.dataframe(
-        df,
-        use_container_width=True
+        df_formatado,
+        use_container_width=True,
+        hide_index=True
     )
 
 # ----------------------------
