@@ -2,31 +2,58 @@ import streamlit as st
 import pandas as pd
 
 # ----------------------------
-# Título do app
+# Configuração da página
 # ----------------------------
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Simulador de Investimento 💰</h1>", unsafe_allow_html=True)
+st.set_page_config(
+    page_title="Simulador de Investimento",
+    page_icon="💰",
+    layout="centered"
+)
+
+# ----------------------------
+# Título
+# ----------------------------
+st.markdown("<h1 style='text-align:center; color:#2E8B57;'>💰 Simulador de Investimento</h1>", unsafe_allow_html=True)
+st.markdown("Simule a evolução do seu investimento com aportes mensais e juros compostos.")
 st.markdown("---")
 
 # ----------------------------
-# Entradas do usuário
+# Entradas em colunas
 # ----------------------------
-st.subheader("Parâmetros do investimento")
+col1, col2 = st.columns(2)
 
-aporte_inicial = st.number_input("Aporte Inicial (R$)", value=14000, step=100)
-aporte_mensal = st.number_input("Aporte Mensal (R$)", value=1000, step=100)
-rentabilidade_mensal = st.number_input("Rentabilidade Mensal (%)", value=1.0, step=0.1) / 100
-meses = st.number_input("Número de Meses", value=12, step=1)
+with col1:
+    aporte_inicial = st.number_input("Aporte Inicial (R$)", value=14000, step=100)
+
+with col2:
+    aporte_mensal = st.number_input("Aporte Mensal (R$)", value=1000, step=100)
+
+col3, col4 = st.columns(2)
+
+with col3:
+    rentabilidade_mensal = st.number_input("Rentabilidade Mensal (%)", value=1.0, step=0.1) / 100
+
+with col4:
+    meses = st.number_input("Número de Meses", value=12, step=1)
+
+st.markdown("")
 
 # ----------------------------
-# Botão de cálculo
+# Botão
 # ----------------------------
-if st.button("Calcular"):
-    
+calcular = st.button("Calcular investimento")
+
+# ----------------------------
+# Cálculo
+# ----------------------------
+if calcular:
+
     acumulado = aporte_inicial
     juros_acumulados = 0
     resultado = []
 
     for mes in range(1, meses + 1):
+
         if mes == 1:
             juros_mes = 0
             acumulado += aporte_mensal
@@ -45,17 +72,40 @@ if st.button("Calcular"):
 
     df = pd.DataFrame(
         resultado,
-        columns=["Mês", "Juros", "Acumulado", "Juros Acumulado"]
+        columns=["Mês", "Juros do Mês", "Total Acumulado", "Juros Acumulados"]
     )
 
     # ----------------------------
-    # Mostrar tabela
+    # Métricas de destaque
     # ----------------------------
-    st.subheader("📊 Tabela de Evolução")
-    st.dataframe(df)
+    st.markdown("### 📊 Resultado do investimento")
+
+    total_aportado = aporte_inicial + (aporte_mensal * meses)
+    patrimonio_final = acumulado
+
+    m1, m2, m3 = st.columns(3)
+
+    m1.metric("💵 Total Investido", f"R$ {total_aportado:,.2f}")
+    m2.metric("💰 Juros Totais", f"R$ {juros_acumulados:,.2f}")
+    m3.metric("🏦 Patrimônio Final", f"R$ {patrimonio_final:,.2f}")
+
+    st.markdown("---")
+
+    # ----------------------------
+    # Tabela
+    # ----------------------------
+    st.subheader("📋 Evolução mês a mês")
+
+    st.dataframe(
+        df,
+        use_container_width=True
+    )
 
 # ----------------------------
 # Rodapé
 # ----------------------------
 st.markdown("---")
-st.markdown("Comece onde você está, use o que você tem e faça o que você pode. — Arthur Ashe 📚")
+st.markdown(
+    "<center><i>Comece onde você está, use o que você tem e faça o que você pode. — Arthur Ashe 📚</i></center>",
+    unsafe_allow_html=True
+)
